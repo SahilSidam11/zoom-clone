@@ -1,14 +1,13 @@
-import { useToast } from "@/components/ui/use-toast";
+import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { Call, useStreamVideoClient } from "@stream-io/video-react-sdk";
-import { useEffect, useState } from "react";
 
 export const useGetCalls = () => {
+  const { user } = useUser();
+  const client = useStreamVideoClient();
   const [calls, setCalls] = useState<Call[]>();
   const [isLoading, setIsLoading] = useState(false);
-  const client = useStreamVideoClient();
-  const { user } = useUser();
-  const { toast } = useToast();
+
   useEffect(() => {
     const loadCalls = async () => {
       if (!client || !user?.id) return;
@@ -16,24 +15,27 @@ export const useGetCalls = () => {
       setIsLoading(true);
 
       try {
-        const { calls } = await client?.queryCalls({
+        // https://getstream.io/video/docs/react/guides/querying-calls/#filters
+        const { calls } = await client.queryCalls({
           sort: [{ field: "starts_at", direction: -1 }],
           filter_conditions: {
-            starts_at: { $exsists: true },
+            starts_at: { $exists: true },
             $or: [
               { created_by_user_id: user.id },
               { members: { $in: [user.id] } },
             ],
           },
         });
+
         setCalls(calls);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       } finally {
         setIsLoading(false);
       }
-      loadCalls();
     };
+
+    loadCalls();
   }, [client, user?.id]);
 
   const now = new Date();
@@ -41,14 +43,10 @@ export const useGetCalls = () => {
   const endedCalls = calls?.filter(({ state: { startsAt, endedAt } }: Call) => {
     return (startsAt && new Date(startsAt) < now) || !!endedAt;
   });
+
   const upcomingCalls = calls?.filter(({ state: { startsAt } }: Call) => {
     return startsAt && new Date(startsAt) > now;
   });
 
-  return {
-    endedCalls,
-    upcomingCalls,
-    callRecordings: calls,
-    isLoading,
-  };
+  return { endedCalls, upcomingCalls, callRecordings: calls, isLoading };
 };
