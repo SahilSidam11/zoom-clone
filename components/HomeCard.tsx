@@ -21,7 +21,7 @@ const HomeCard = ({
   return (
     <div
       className={cn(
-        `bg-orange-1 px-4 py-6 flex flex-col justify-between w-ful xl:max-w-[270px] min-h-[260px] rounded-[14px] cursor-pointer`,
+        `bg-orange-1 px-4 py-6 flex flex-col justify-between w-ful xl:max-w-[270px] min-h-[260px] rounded-[14px] cursor-pointer hover:scale-105 animate ease-in-out duration-200`,
         className
       )}
       onClick={handleClick}
