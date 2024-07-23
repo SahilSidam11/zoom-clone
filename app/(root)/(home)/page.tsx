@@ -1,5 +1,4 @@
 import MeetingTypeList from "@/components/MeetingTypeList";
-import { Meteors } from "@/components/meteors/Meteors";
 
 const Home = () => {
   const now = new Date();
