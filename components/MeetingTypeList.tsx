@@ -194,6 +194,9 @@ const MeetingTypeList = () => {
         <Input
           placeholder="Meeting Link"
           className="border-none bg-dark-3 focus-visible:ring-0 focus-visible:ring-offset-0"
+          onChange={(prev) => {
+            setValues({ ...values, link: prev.target.value });
+          }}
         />
       </MeetingModal>
     </section>
